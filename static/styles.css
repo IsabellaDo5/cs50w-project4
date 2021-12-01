@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+
+.aaa {
+    padding-top: 8.0rem!important;
+    padding-bottom: 1.5rem!important;
+}
+
+.bg-custom {
+    background-color: #00000033 !important; 
+    border-radius: 30px;
+}
+.bg-img1{
+    max-height: 100%;
+    max-width: 100%;
+}
+.user{
+    text-align: center;
+    font-weight: 500px;
+}
+.hola {
+    /*background-image: url("https://64.media.tumblr.com/368c0d27e2fa577be88b474239f4d82a/f769488460e0ed44-9e/s1280x1920/56744e7debd9b498e170b3460a907cf5e529cb94.jpg");*/
+    /*background-color: #cccccc;*/
+    height: 93vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+  }
+
+.title{
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 2.5rem;
+    
+}
+.bg-light {
+    background-color: inherit !important; 
+}
+
+.border-bottom {
+    border-bottom: 1px solid #b2b3b5!important;
+}
+
+.color{
+    color:white;
+}
+
+.navbar-collapse {
+    flex-grow: 0;
+
+}
+
+.border {
+    border: 1px solid #ffffffbf!important;
+    border-radius: 30px !important;
+}
+
+.card{
+    width: 80%;
+    margin-top: .5rem;
+    margin-bottom: .2rem;
+}
+
+.p-4 {
+    padding: 2.5rem!important;
+}
+.offcanvas-start {
+    width: 300px !important;
+}
+.navbar-collapse {
+    flex-grow: 0 !important; 
+
+}
+
+.img-thumbnail {
+    padding: .25rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+    max-width: 15vw !important;
+    height: 25vh !important;
+    object-position: center !important;
+    object-fit: cover !important;
+}
+
+#sidebar ul li.active>a, a[aria-expanded="true"] {
+    background: #8496ad !important;
+}
+
+.btn-info:hover, .btn-info {
+    color: #fff;
+    background-color: #9eb2cb !important;
+    border-color: #8496ad !important;
+}
+.f-g{
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    margin-left: 1rem;
+    width: 80% !important;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #9eb2cb;
+}
+.nav-link {
+    color:black;
+}
+
+.col-4 {
+    flex: 0 0 auto;
+    width: 15rem !important;
+}
+
+.alinear{
+    text-align: center !important;
+}
+@media (min-width: 768px){
+    .p-md-5 {
+        padding: 4rem!important;
+    }
+}
+@media (max-width: 900px){
+    .img-thumbnail {
+        max-width: 75vw !important;
+        height: 45vh !important;
+    }
+    .col-4{
+        flex: 0 0 auto;
+        width: 50% !important;
+    }
+}

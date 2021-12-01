@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}is-art{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="vr">
+        <h2 style="font-weight: 600">{{type}}</h2>
+    </div>
+    {% for i in tag_html %}
+    <h4>user id : @{{i.user_id}}</h4>
+    <!--<img src="" class="img-fluid" />-->
+    <img src="{{i.photo}}" class="img-thumbnail" alt="...">
+    {% endfor %}
+</div>
+{% endblock %}

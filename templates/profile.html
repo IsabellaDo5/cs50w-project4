@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}{{username}} {% endblock %}
+
+{% block main %}
+
+<div class="container">
+    {% for i in info %}
+    <h1>{{i.name}}</h1>
+    <h4>@{{i.username}}</h4>
+    <p>{{desc}}</p>
+    {% endfor %}
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4">
+        {% for y in info %}
+        <div class="col">
+                <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                    <img src="{{y.photo}}" class="img-thumbnail" />
+                    <a href="#!">
+                    <div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>
+                    </a>
+                </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}

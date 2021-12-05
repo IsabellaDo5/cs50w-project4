@@ -52,6 +52,7 @@ def login_required(f):
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
+
 @app.route("/")
 #@login_required
 def main():
@@ -113,7 +114,8 @@ def register():
 
             session["user_id"] = datos[0]["user_id"]
 
-            db.execute("INSERT INTO profiles (user_id) VALUES (:user_id)", {"user_id": session["user_id"]})
+            url_icon = "https://icons-for-free.com/iconfiles/png/512/avatar+human+people+profile+user+icon-1320168139431219590.png"
+            db.execute("INSERT INTO profiles (user_id, icon) VALUES (:user_id, :icon)", {"user_id": session["user_id"], "icon": url_icon})
             db.commit()
         return redirect("/")
     else:
@@ -173,7 +175,7 @@ def crearpost():
     if request.method == "POST":
 
         if "archivo" not in request.files:
-            return render_template("nuevopost.html")
+            return render_template("subir_img.html")
         
         archivo = request.files['archivo']
 
@@ -230,51 +232,87 @@ def tag(tag):
 def buscar():
     if request.method == "POST":
         busq = request.form.get("search")
-        a = "%"+busq+"%"
+        a = '%'+busq+'%'
+
+        print(a)
         by_tag = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE LOWER(tag) LIKE LOWER(:busq)", {"busq":a}).fetchall()
         
         # Busqueda por descripción
         descripcion = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE LOWER(description) LIKE LOWER(:busq)", {"busq":a}).fetchall()
         
-        usuarios = db.execute("SELECT username, name FROM users WHERE LOWER(username) LIKE LOWER(:busq)", {"busq": busq}).fetchall()
+        usuarios = db.execute("SELECT username, name FROM users WHERE LOWER(username) LIKE LOWER(:busq)", {"busq": a}).fetchall()
 
+        if len(by_tag) == 0:
+            tag_disp = False
+        else:
+            tag_disp = True
+        
+        
+        if len(descripcion) == 0:
+            desc_disp = False
+        else:
+            desc_disp = True
+        
+        if len(usuarios) == 0:
+            user_disp = False
+        else:
+            user_disp = True
+        
         print(by_tag)
-        '''for i in range(len(by_tag)):
-            tags_1 = []
-            post_id = by_tag[i]["post_id"]
-            print(post_id)
+        print(descripcion)
+        print(usuarios)
+        print(user_disp)
+        return render_template("resultados.html", por_tag = by_tag, desc= descripcion, cat=cat, tags = tags, users = usuarios, tag = tag_disp, user = user_disp)
 
-            tags = db.execute("SELECT tag FROM tags WHERE post_id = :post_id", {"post_id": post_id}).fetchall()
-            
-            tags_1.append(tags[i]["tag"])
-        tags2 = db.execute("SELECT tag FROM tags WHERE post_id = :post_id", {"post_id": post_id}).fetchall()    
-        print(tags2)'''
-
-        '''print(tags_1)'''
-        return render_template("resultados.html", por_tag = by_tag, desc= descripcion, cat=cat, tags = tags, users = usuarios)
-
-@app.route("/admin")
+@app.route("/settings", methods=["GET", "POST"])
 @login_required
-def admin():
-    return "Hola"
+def settings(username):
+    if request.method == "POST":
+        description = request.form.get("texto")
+        if "archivo" not in request.files:
+            db.execute("UPDATE profiles SET description = :description WHERE user_id = :user_id",{"user_id": session["user_id"]})
+            db.commit()
+        
+        archivo = request.files['archivo']
+        
+        if archivo.filename == "":
+            return render_template("subir_img.html")
+
+        if archivo:
+            nombreArchivo = archivo.filename
+            archivo.save(os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))
+
+            url_img = (os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))[1:len(os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))]
+            
+            print(url_img)
+
+            db.execute("UPDATE profiles SET icon = :icon, description = :description WHERE user_id = :user_id ", {"icon": url_img, "description": description, "user_id": session["user_id"]})
+            db.commit()
+
+        return redirect("/profile/"+username)
+    xd = db.execute("SELECT description FROM profiles WHERE user_id = :user_id",{"user_id": session["user_id"]}).fetchall()
+    perfil_desc = xd[0]["description"]
+
+    return render_template("settings.html", desc = perfil_desc)
 
 @app.route("/profile/<username>")
 def perfil(username):
 
     xd = db.execute("SELECT user_id FROM users WHERE username = :username", {"username": username}).fetchall()
     user_id = xd[0]["user_id"]
-    info = db.execute("SELECT username, name, profiles.user_id, description FROM users INNER JOIN profiles ON users.user_id = profiles.user_id WHERE profiles.user_id = :user_id", {"user_id": user_id}).fetchall()
-    
+    info = db.execute("SELECT username, name, profiles.user_id, description, icon FROM users INNER JOIN profiles ON users.user_id = profiles.user_id WHERE profiles.user_id = :user_id", {"user_id": user_id}).fetchall()
+    user= info[0]["user_id"]
+    posts = db.execute("SELECT * FROM posts WHERE user_id = :user_id", {"user_id": user}).fetchall()
+
+    print(posts)
     try:
         desc = info[0]["description"] 
     except:
 
         desc = "Este usuario no tiene una descripción"
-    return render_template("profile.html", info = info, desc= desc, cat=cat, tags = tags, username = username)
 
-@app.route("/settings")
-def mi_perfil():
-    return "hola xd"
+    print(info)
+    return render_template("profile.html", info = info, desc= desc, cat=cat, tags = tags, username = username)
 
 @app.route("/logout")
 @login_required

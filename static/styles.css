@@ -114,6 +114,11 @@
 .alinear{
     text-align: center !important;
 }
+
+.icon{
+    width:15%;
+    border-radius: 100%;
+}
 @media (min-width: 768px){
     .p-md-5 {
         padding: 4rem!important;
@@ -127,5 +132,8 @@
     .col-4{
         flex: 0 0 auto;
         width: 50% !important;
+    }
+    .icon{
+        width: 50%;
     }
 }

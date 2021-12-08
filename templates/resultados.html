@@ -3,70 +3,84 @@
 {% block title %}is-art{% endblock %}
 
 {% block main %}
-<div class="container">
-    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Tag</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Descripción</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Usuarios</button>
-        </li>
-    </ul>
-    <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+<div class="container" style="position: relative;">
+    
+    <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+        <a class="navbar-brand" href="#">Coincidencias para: "{{busq}}"</a>
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link" href="#scrollspyHeading1">Tag</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#scrollspyHeading2">Descripción</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#scrollspyHeading3">Usuarios</a>
+          </li>
+        </ul>
+    </nav>
+      <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+        <h4 id="scrollspyHeading1">Tag</h4>
         {% if tag %}
-            {% for i in por_tag%}
-            <h4>user_id : {{i.user_id}}</h4>
-            <img src="{{i.photo}}" class="img-thumbnail"/>
-            {% endfor %}
+            <section class="photo-grid-container" style="margin-top:1.5rem;">
+                {% for i in por_tag%}
+                <div class="photo-grid-item">
+                <a href="/post/{{i.post_id}}"> <img src="{{i.photo}}" alt="" /></a>
+                </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            <div class="alinear">
+            <img src="../static/icons/not-found.png" style="width:20rem !important">
+                <h4>No se encontraron coincidencias</h4>
+                <p>Trata realizando otra búsqueda</p>
+        {% endif %}
+            </div>
+        <hr>
+        <!---->
+        
+        <h4 id="scrollspyHeading2">Descripción</h4>
+        {% if desc %}
+            <section class="photo-grid-container" style="margin-top:1.5rem;">
+                {% for i in desc%}
+                <div class="photo-grid-item">
+                <a href="/post/{{i.post_id}}"> <img src="{{i.photo}}" alt="" /></a>
+                </div>
+                {% endfor %}
+            </section>
         {% else %}
         <div class="alinear">
         <img src="../static/icons/not-found.png" style="width:20rem !important">
             <h4>No se encontraron coincidencias</h4>
             <p>Trata realizando otra búsqueda</p>
         {% endif %}
-    </div>
-    </div>
-    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-        {% if desc %}    
-            {% for i in desc%}
-            <h4>user_id : {{i.user_id}}</h4>
-            <img src="{{i.photo}}" class="img-thumbnail"/>
-            {% endfor %}
-        {% else %}
-        <div class="alinear">
-        <img src="../static/icons/not-found.png" style="width:20rem !important">
-            <h4>No se encontraron coincidencias</h4>
-            <p>Trata realizando otra búsqueda</p>
-        </div>
-        {% endif %}
-    </div>
-    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+        
+        <hr>
+
+        <!---->
+        <h4 id="scrollspyHeading3">Usuarios</h4>
         {% if user %}
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 {% for i in users %}
                 <div class="col-4">
                     <div class="card h-100">
-                        <img src="data:image/jpeg;base64,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" class="card-img-top" alt="...">
+                        <img src="{{i.icon}}" class="card-img-top" alt="icon">
                         <div class="card-body">
-                            <h4 class="card-title alinear"><a href="/profile/{{i.username}}"> {{i.name}}</a></h4>
-                            <p class="card-text alinear" style="font-size:1rem !important; ">@{{i.username}}</p>
+                            <h5 class="card-title">{{i.name}}</h5>
+                            <p class="card-text">@{{i.username}}</p>
+                            <a href="/profile/{{i.username}}" class="stretched-link" style="color:white !important;">i</a>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                    {% endfor %}
             </div>
         {% else %}
-        <div class = "alinear">
+        <div class="alinear">
             <img src="../static/icons/not-found.png" style="width:20rem !important">
-            <h4>No se encontraron coincidencias</h4>
-            <p>Trata realizando otra búsqueda</p>
+                <h4>No se encontraron coincidencias</h4>
+                <p>Trata realizando otra búsqueda</p>
         </div>
         {% endif %}
-    </div>
-    </div>
+                
 </div>
 {% endblock %}

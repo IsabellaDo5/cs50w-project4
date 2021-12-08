@@ -3,19 +3,21 @@
 {% block title %}is-art{% endblock %}
 
 {% block main %}
+
+
 <div class="container">
-    <h2>Inicio</h2>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4">
+    <h2>Más recientes</h2>
+    <hr>
+    <!--No recuerdo de qué página lo saqué xd -->
+    <section class="photo-grid-container">
         {% for y in info %}
-        <div class="col">
-                <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-                    <img src="{{y.photo}}" class="img-thumbnail" />
-                    <a href="#!">
-                    <div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>
-                    </a>
-                </div>
+        <div class="photo-grid-item">
+          <a href="/post/{{y.post_id}}"> <img src="{{y.photo}}" alt="" /></a>
         </div>
         {% endfor %}
-    </div>
+    </section>
+
+
+    <hr>
 </div>
 {% endblock %}

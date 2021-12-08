@@ -4,13 +4,18 @@
 
 {% block main %}
 <div class="container">
+    {% for i in tag_html%}
     <div class="vr">
-        <h2 style="font-weight: 600">{{type}}</h2>
+        <h2 style="font-weight: 600">#{{i.tag}}</h2>
     </div>
-    {% for i in tag_html %}
-    <h4>user id : @{{i.user_id}}</h4>
-    <!--<img src="" class="img-fluid" />-->
-    <img src="{{i.photo}}" class="img-thumbnail" alt="...">
+    <hr>
     {% endfor %}
+    <section class="photo-grid-container">
+        {% for i in tag_html %}
+        <div class="photo-grid-item">
+          <a href="/post/{{i.post_id}}"> <img src="{{i.photo}}" alt="" /></a>
+        </div>
+        {% endfor %}
+    </section>
 </div>
 {% endblock %}

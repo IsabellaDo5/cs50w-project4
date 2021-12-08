@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}is-art{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+      <div class="col-md-7">
+
+        <div class="card text-center">
+            <div class="card-header">
+              <ul class="nav nav-pills card-header-pills">
+                {% for i in post %}
+                <li class="nav-item">
+                    {% for a in icon%}
+                    <a class="navbar-brand" href="/profile/{{i.username}}">
+                        <img src="{{a.icon}}" alt="icon" style="width:40px;" class="rounded-pill"> {{i.name}} (@{{i.username}})
+                    </a>
+                    {% endfor %}
+                </li>
+              </ul>
+            </div>
+            <div class="card-body">
+                <div>
+                    <img src="{{i.photo}}" style="max-width:25em;" alt="...">
+                </div>
+              <br>
+              <p class="card-text">{{i.description}} <hr> Tags:</p>
+                {% for x in tags%}
+                <a href="/tag/{{x.tag}}">#{{x.tag}}</a>
+                {% endfor%}
+              {% endfor %}
+            </div>
+          </div>
+      </div>
+      <div class="col">
+            <h2>Comentarios</h2>
+            <div class="card text-center">
+                <div class="card-header">
+                <ul class="nav nav-pills card-header-pills">
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">username here</a>
+                    </li>
+                </ul>
+                </div>
+                <div class="card-body">
+                <p class="card-text">XDDDDDDDDDDDDDDDDDDDDDDDDD</p>
+                </div>
+            </div>
+            <hr>
+            <div>
+                <div class="form-floating">
+                    <h4>Agregar un comentario</h4>
+                    {% if session.user_id %}
+                    <form action="">
+                        
+                        <textarea class="form-control" placeholder="Agregar un comentario" id="floatingTextarea">Todavía no se puede comentar, no lo intentés</textarea>
+                        <button class="btn btn-outline-success" type="submit">Publicar</button>
+                    </form>
+                    {% else %}
+                    <p><i>Necesitas iniciar sesión para agregar un comentario.</i></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}

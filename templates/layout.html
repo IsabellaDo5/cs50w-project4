@@ -38,9 +38,15 @@
             
             <ul class="list-unstyled components">
                 {% if session.user_id %}
-                <a href="/profile/{{username1}}" class="user">{{username1}}</a>
+                {% for i in info_user%}
+                <a class="navbar-brand" href="/profile/{{i.username}}">
+                    <img src="https://i.pinimg.com/originals/33/9a/39/339a398b31af3f3b979b0360df67aa9f.jpg" alt="icon" style="width:60px; margin-left:8%" class="rounded-pill">
+                </a>
+                <a href="/profile/{{i.username}}" class="user">{{i.username}}</a>
+                {% endfor %}
+                <hr>
                  <li>
-                    <a href="/upload" >Subir un dibujo</a>
+                    <a href="/upload">Subir una ilustración</a>
                 </li>
                 {% endif %}
                 <li class="active">
@@ -68,6 +74,9 @@
                 <br>
                 {% if session.user_id%}
                 <li>
+                    <a href="/repo">Mi repositorio</a>
+                </li>
+                <li>
                     <a href="/settings">Configuración</a>
                 </li>
             </ul>
@@ -92,6 +101,7 @@
                     <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-align-justify"></i>
                     </button>
+                    <a href="/" class="d-inline-block">Ir a inicio</a>
 
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <form action="/search" method = "post" class="d-flex">

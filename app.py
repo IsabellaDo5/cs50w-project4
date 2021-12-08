@@ -15,6 +15,8 @@ from datetime import datetime, date
 UPLOAD_FOLDER = "./static/img/"
 ALLOWED_EXTENSIONS = {'.jpg', '.png', '.psd','.svg'}
 
+#REPOSITORIO
+REPOS_FOLDER = "./static/repositorio/"
 app = Flask(__name__)
 
 # Check for environment variable
@@ -25,6 +27,9 @@ app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#REPOSITORIO
+app.config['REPOS_FOLDER'] = REPOS_FOLDER
 Session(app)
 
 # Configure session to use filesystem
@@ -54,26 +59,26 @@ def login_required(f):
     return decorated_function
 
 @app.route("/")
-#@login_required
 def main():
 
     try:
-        session["user_id"]
-        usuario = db.execute("SELECT username,age FROM users WHERE user_id = :user_id", {"user_id":session["user_id"]}).fetchall()
+        a = session["user_id"]
+        usuario = db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":a }).fetchall()
         
-        nombre_usuario = usuario[0]["username"]
+        nombre = usuario[0]["name"]
+        print(usuario)
         age= usuario[0]["age"]
         
         if age < 18:
-            info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL").fetchall()
+            info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY post_id DESC").fetchall()
             print(info)
         else:
             info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id").fetchall()
         
-        return render_template("index.html", info = info, cat = cat, username1 = nombre_usuario, tags = tags)
+        return render_template("index.html", info = info, cat = cat, tags = tags, info_user = usuario)
     except:
-        info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL").fetchall()
-        print(tags)
+        info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY post_id DESC").fetchall()
+        print(info)
         return render_template("index.html", info = info, cat = cat, tags = tags)
 
 @app.route("/register",  methods=["GET","POST"])
@@ -212,10 +217,11 @@ def crearpost():
                 db.commit()
             return redirect("/")
         else:
-            return render_template("subir_img.html", cat=cat)
+            return render_template("subir_img.html", cat=cat,)
     else:
         opc = db.execute("SELECT type FROM types").fetchall()
-        return render_template("subir_img.html", coincidencias = opc, cat = cat)
+        tags = db.execute("SELECT tag FROM tags ORDER BY RANDOM() LIMIT 5").fetchall()
+        return render_template("subir_img.html", coincidencias = opc, cat = cat, tags = tags)
 
 @app.route("/topics/<type>")
 def topics(type):
@@ -240,7 +246,7 @@ def buscar():
         # Busqueda por descripción
         descripcion = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE LOWER(description) LIKE LOWER(:busq)", {"busq":a}).fetchall()
         
-        usuarios = db.execute("SELECT username, name FROM users WHERE LOWER(username) LIKE LOWER(:busq)", {"busq": a}).fetchall()
+        usuarios = db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE LOWER(username) LIKE LOWER(:busq)", {"busq": a}).fetchall()
 
         if len(by_tag) == 0:
             tag_disp = False
@@ -262,21 +268,33 @@ def buscar():
         print(descripcion)
         print(usuarios)
         print(user_disp)
-        return render_template("resultados.html", por_tag = by_tag, desc= descripcion, cat=cat, tags = tags, users = usuarios, tag = tag_disp, user = user_disp)
+        return render_template("resultados.html", por_tag = by_tag, desc= descripcion, cat=cat, tags = tags, busq = busq, users = usuarios, tag = tag_disp, user = user_disp)
+
+@app.route("/post/<post_id>")
+def verpost(post_id):
+    post = db.execute("SELECT post_id, posts.user_id, photo, description, username, name FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE post_id = :post_id", {"post_id": post_id}).fetchall()
+    tags_p = db.execute("SELECT tag FROM tags WHERE post_id =:post_id", {"post_id": post_id}).fetchall()
+
+    user_id = post[0]["user_id"]
+    icon = db.execute("SELECT icon from profiles where user_id = :user_id",{"user_id": user_id}).fetchall()
+    print(post)
+    print(tags_p)
+    return render_template("post.html", post = post, icon = icon, tags = tags_p)
 
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
-def settings(username):
+def settings():
     if request.method == "POST":
+        info = db.execute("SELECT username FROM users WHERE user_id = :user_id", {"user_id": session["user_id"]}).fetchall()
+        username = info[0]["username"]
+
+        # Datos del html
         description = request.form.get("texto")
-        if "archivo" not in request.files:
-            db.execute("UPDATE profiles SET description = :description WHERE user_id = :user_id",{"user_id": session["user_id"]})
-            db.commit()
-        
         archivo = request.files['archivo']
         
-        if archivo.filename == "":
-            return render_template("subir_img.html")
+        if "archivo" not in request.files or archivo.filename == "":
+            db.execute("UPDATE profiles SET description = :description WHERE user_id = :user_id",{"user_id": session["user_id"], "description": description})
+            db.commit()
 
         if archivo:
             nombreArchivo = archivo.filename
@@ -290,29 +308,63 @@ def settings(username):
             db.commit()
 
         return redirect("/profile/"+username)
+
     xd = db.execute("SELECT description FROM profiles WHERE user_id = :user_id",{"user_id": session["user_id"]}).fetchall()
     perfil_desc = xd[0]["description"]
 
-    return render_template("settings.html", desc = perfil_desc)
+    return render_template("settings.html", desc = perfil_desc, tags = tags, cat = cat)
 
 @app.route("/profile/<username>")
 def perfil(username):
 
-    xd = db.execute("SELECT user_id FROM users WHERE username = :username", {"username": username}).fetchall()
-    user_id = xd[0]["user_id"]
-    info = db.execute("SELECT username, name, profiles.user_id, description, icon FROM users INNER JOIN profiles ON users.user_id = profiles.user_id WHERE profiles.user_id = :user_id", {"user_id": user_id}).fetchall()
+    xd = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchall()
+    id_user = xd[0]["user_id"]
+    info = db.execute("SELECT username, name, profiles.user_id, description, icon FROM users INNER JOIN profiles ON users.user_id = profiles.user_id WHERE profiles.user_id = :user_id", {"user_id": id_user}).fetchall()
     user= info[0]["user_id"]
-    posts = db.execute("SELECT * FROM posts WHERE user_id = :user_id", {"user_id": user}).fetchall()
+    posts = db.execute("SELECT * FROM posts WHERE user_id = :user_id", {"user_id": user }).fetchall()
 
+    usuario = False
     print(posts)
+    print(id_user)
     try:
         desc = info[0]["description"] 
     except:
 
         desc = "Este usuario no tiene una descripción"
 
+    try:
+        session["user_id"]
+        if id_user == session["user_id"]:
+            usuario = True
+    except:
+        usuario = False
+
+
+    
     print(info)
-    return render_template("profile.html", info = info, desc= desc, cat=cat, tags = tags, username = username)
+    return render_template("profile.html", info = info, desc= desc, cat=cat, tags = tags, username = username, posts = posts, propietario = usuario)
+
+@app.route("/repo", methods=["GET", "POST"])
+@login_required
+def repos():
+    if request.method == 'POST':
+        if "archivo" not in request.files:
+            return render_template("repos.html", cat=cat, tags = tags)
+        
+        archivo = request.files['archivo']
+        
+        if archivo.filename == "":
+            return render_template("repos.html")
+
+        if archivo:
+            nombreArchivo = archivo.filename
+            archivo.save(os.path.join(app.config["REPOS_FOLDER"], nombreArchivo))
+
+            url_img = (os.path.join(app.config["REPOS_FOLDER"], nombreArchivo))[1:len(os.path.join(app.config["REPOS_FOLDER"], nombreArchivo))]
+            db.execute("INSERT INTO repos (user_id, source) VALUES(:user_id, :source)", {"user_id" : session["user_id"]})
+        return redirect("/")
+    else:
+        return render_template("repos.html", tags = tags, cat = cat)
 
 @app.route("/logout")
 @login_required

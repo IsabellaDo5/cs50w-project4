@@ -11,19 +11,29 @@
             <img src="{{i.icon}}" class="icon" />
             <h1>{{i.name}}</h1>
             <h5 style="font-size: 1.2rem;">@{{i.username}}</h5>
+            {% if desc %}
             <p>{{desc}}</p>
-        {% endfor %}
+            {% else %}
+            <p style="color:gray !important;"><i>Sin descripción por parte del usuario</i></p>
+            {% endif %}
+            
+        
         </div>
     </div>
     <hr>
-    <h3 class="alinear"> Ilustraciones de @ xd</h3>
-    <div class="row row-cols-4">
-        {% for i in info%}
-        <div class="col">
-            <h4></h4>
-        </div>
-        {% endfor %}
-    </div>
+    {% if propietario%}
+    <h3 class="alinear"> Mis ilustraciones</h3>
+    {% else %}
+    <h3 class="alinear"> Ilustraciones de {{i.name}}</h3>
+    {% endif %}
+    {% endfor %}
+        <section class="photo-grid-container" style="margin-top: 2.5rem;">
+            {% for y in posts %}
+            <div class="photo-grid-item">
+              <a href="/post/{{y.post_id}}"> <img src="{{y.photo}}" alt="" /></a>
+            </div>
+            {% endfor %}
+        </section>
 
 </div>
 

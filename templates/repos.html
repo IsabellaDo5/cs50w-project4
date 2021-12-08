@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}is-art{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div style="margin-bottom:2.5rem;">
+        <h2>Mi repositorio privado</h2>
+        <div class="">
+            <form action="">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Archivo aquí
+                    
+                    <span><button type="submit" class="btn btn-success">Descargar</button> <button type="submit" value="" class="btn btn-danger">Eliminar</button></span>
+                    </li>
+                </ul>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Archivo aquí
+                    
+                    <span><button type="submit" class="btn btn-success">Descargar</button> <button type="submit" value="" class="btn btn-danger">Eliminar</button></span>
+                    </li>
+                </ul>
+            </form>
+
+        </div>
+    </div>
+    <hr>
+    <div style="margin-top:2.5rem;">
+        <form action="/repo" method = "POST">
+            <h4>Subir un nuevo archivo</h4>
+            <p>Solamente archivos .png, .jpg, .psd, .svg</p>
+            <div class="input-group">
+                <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept=".jpg, .jpeg, .png, .psd, .svg">
+                <button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon04">Subir</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

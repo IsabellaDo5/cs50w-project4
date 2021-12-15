@@ -6,6 +6,16 @@
 
 
 <div class="container">
+    <h2>Popular</h2>
+    <hr>
+    <section class="photo-grid-container">
+      {% for y in popular %}
+      <div class="photo-grid-item">
+        <a href="/post/{{y.post_id}}"> <img src="{{y.photo}}" alt="" /></a>
+      </div>
+      {% endfor %}
+  </section>
+    <br>
     <h2>Más recientes</h2>
     <hr>
     <!--No recuerdo de qué página lo saqué xd -->
@@ -17,7 +27,5 @@
         {% endfor %}
     </section>
 
-
-    <hr>
 </div>
 {% endblock %}

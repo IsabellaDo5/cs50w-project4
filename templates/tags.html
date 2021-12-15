@@ -4,12 +4,10 @@
 
 {% block main %}
 <div class="container">
-    {% for i in tag_html%}
     <div class="vr">
-        <h2 style="font-weight: 600">#{{i.tag}}</h2>
+        <h2 style="font-weight: 600">#{{titulo}}</h2>
     </div>
     <hr>
-    {% endfor %}
     <section class="photo-grid-container">
         {% for i in tag_html %}
         <div class="photo-grid-item">

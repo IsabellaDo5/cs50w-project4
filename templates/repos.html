@@ -7,35 +7,46 @@
     <div style="margin-bottom:2.5rem;">
         <h2>Mi repositorio privado</h2>
         <div class="">
-            <form action="">
+            {% if archivos%}
+                {% for i in archivos%}
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Archivo aquí
-                    
-                    <span><button type="submit" class="btn btn-success">Descargar</button> <button type="submit" value="" class="btn btn-danger">Eliminar</button></span>
+                    {{i.name}}
+                    <form action="/delete_r/{{i.repo_id}}" method="post">
+                        <span>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <a href="{{i.source}}" target="_blank" class="btn btn-outline-success">Abrir</a>
+                                <a href="{{i.source}}" download="{{i.name}}" class="btn btn-outline-warning">Descargar</a>
+                                <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+                            </div>
+                        </span>
+                    </form>
                     </li>
                 </ul>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Archivo aquí
-                    
-                    <span><button type="submit" class="btn btn-success">Descargar</button> <button type="submit" value="" class="btn btn-danger">Eliminar</button></span>
-                    </li>
-                </ul>
-            </form>
-
+                {% endfor %}
+            {% else %}
+            <img src="../static/icons/wallet.png" style="width:5rem !important;  margin-top:auto; margin-left: auto;
+            margin-right: auto; display: block;">
+            <h4 style="text-align:center;">Este repositorio está algo vacío.</h4>
+            {% endif %}
         </div>
     </div>
     <hr>
+    {% if permiso %}
     <div style="margin-top:2.5rem;">
-        <form action="/repo" method = "POST">
-            <h4>Subir un nuevo archivo</h4>
+        <form action="/repo" method = "POST" enctype="multipart/form-data">
+            <h3>Subir un nuevo archivo</h3>
             <p>Solamente archivos .png, .jpg, .psd, .svg</p>
             <div class="input-group">
-                <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept=".jpg, .jpeg, .png, .psd, .svg">
+                <input type="file" name="archivo" class="form-control" id="archivo" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept=".jpg, .jpeg, .png, .psd, .svg">
                 <button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon04">Subir</button>
             </div>
         </form>
     </div>
+    {% else %}
+    <div style="margin-top:2.5rem;">
+        <p>No tienes espacio para subir más archivos, elimina algunos para aumentarlo</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

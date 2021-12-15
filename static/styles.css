@@ -18,8 +18,8 @@
     font-weight: 500px;
 }
 .hola {
-    /*background-image: url("https://64.media.tumblr.com/368c0d27e2fa577be88b474239f4d82a/f769488460e0ed44-9e/s1280x1920/56744e7debd9b498e170b3460a907cf5e529cb94.jpg");*/
-    /*background-color: #cccccc;*/
+    /*background-image: url("https://64.media.tumblr.com/368c0d27e2fa577be88b474239f4d82a/f769488460e0ed44-9e/s1280x1920/56744e7debd9b498e170b3460a907cf5e529cb94.jpg");
+    filter: brightness(60%);*/
     height: 93vh;
     background-position: center;
     background-repeat: no-repeat;
@@ -82,20 +82,28 @@
     object-fit: cover !important;
 }
 
-#sidebar ul li.active>a, a[aria-expanded="true"] {
-    background: #8496ad !important;
-}
 
 .btn-info:hover, .btn-info {
     color: #fff;
-    background-color: #9eb2cb !important;
-    border-color: #8496ad !important;
+    background-color: #252422 !important;
+    border-color: #252422 !important;
 }
 .f-g{
     margin-top: .5rem;
     margin-bottom: .5rem;
     margin-left: 1rem;
     width: 80% !important;
+}
+
+.btn-primary{
+    color:black;
+    background-color: #ccc5b9;
+    border-color: #403d39;
+}
+.btn-primary:hover{
+    color:white;
+    background-color: #403d39;
+    border-color: #403d39;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
@@ -125,6 +133,12 @@
     border-color: inherit;
 }
 
+
+.btn-check:focus+.btn, .btn:focus {
+    outline: 0;
+     box-shadow: none !important; 
+}
+
 /*HOLAAAAAAAAA*/
 
 img {
@@ -139,10 +153,12 @@ img {
     max-width: 400px;
     width: 100%;
   }
-  .photo-grid-item::hover {
-    background-color:rgb(0 0 0 / 9%);
+  .photo-grid-item:hover {
+    filter: brightness(60%);
   }
-
+  .f-g {
+    margin-top: 1.5rem;
+  }
 @media (min-width: 768px){
     .p-md-5 {
         padding: 4rem!important;

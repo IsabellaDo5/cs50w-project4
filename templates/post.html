@@ -5,7 +5,7 @@
 {% block main %}
 <div class="container">
     <div class="row">
-      <div class="col-md-7">
+      <div class="col-md-7" style="margin-bottom:2rem">
 
         <div class="card text-center">
             <div class="card-header">
@@ -32,36 +32,105 @@
               {% endfor %}
             </div>
           </div>
+
+            <div class="" style="margin-top: 1rem;">
+              {% if session.user_id %}
+                {% for i in post %}
+                  {% if like%}
+                  <form action="/dislike" method="POST">
+                    <span>{{cant_likes}}</span>
+                    <input class="visually-hidden" name="info" value="{{i.post_id}}"></input>
+                    <button type="submit" class="btn"><img src="../static/icons/like.png" style=" width: 40px; height: 40px; !important;" /></button>
+                  </form>
+                  {% else %}
+
+                  <form action="/like" method="POST">
+                    <span>{{cant_likes}}</span>
+                    <input class="visually-hidden" name="info" value="{{i.post_id}}"></input>
+                    <button type="submit" class="btn"><img src="../static/icons/no_like.png" style="width: 40px; height: 40px; !important;" /></button>
+                  </form>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                  <!-- Button trigger modal -->
+                  <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <span>{{cant_likes}}</span>
+                    <img src="../static/icons/no_like.png" style="width: 40px; height: 40px; !important;" />
+                  </button>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">is-art</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Necesitas iniciar sesión para dejar un like.
+                        </div>
+                        <div class="modal-footer">
+
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                          <a href="/login" type="button" class="btn btn-primary">Iniciar sesión</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              {% endif %}
+            </div>
+          
       </div>
       <div class="col">
-            <h2>Comentarios</h2>
-            <div class="card text-center">
-                <div class="card-header">
-                <ul class="nav nav-pills card-header-pills">
-                    <li class="nav-item">
-                    <a class="nav-link" href="#">username here</a>
-                    </li>
-                </ul>
+        <div>
+
+          {% if propietario or admin%}
+          {% for x in post%}
+          <form action="/delete_post/{{x.post_id}}" method="POST">
+            <input class="visually-hidden" name="comment" value="{{x.post_id}}"></input>
+            <button type="submit" class="btn btn-danger">Eliminar el post</button>
+          </form>
+          <hr>
+          {% endfor %}
+          {% endif %}
+          
+          <div class="form-floating">
+              <h4>Agregar un comentario</h4>
+              {% if session.user_id %}
+              {% for i in post %}
+              <form action="/review" method= "POST" >
+                  <input class="visually-hidden" name="info" value="{{i.post_id}}"></input>
+                  <textarea class="form-control" placeholder="" id="floatingTextarea" name="comentario"></textarea>
+                  <button class="btn btn-primary" type="submit" style= "margin-top:1rem;">Publicar</button>
+              </form>
+              {% endfor %}
+              {% else %}
+              <p><i>Necesitas iniciar sesión para agregar un comentario.</i></p>
+              {% endif %}
+          </div>
+
+        </div>
+        <hr>
+            <h3>Comentarios</h3>
+            {% if reviews %}
+              {% for i in reviews%}
+              <div class="card border-success mb-3" style="background-color:white; border-color: #000000!important;">
+                <div class="card-body text-dark">
+                  <p class="card-text"><a href="/profile/{{i.username}}" style="color:blue;">{{i.username}}</a> {{i.comment}}</p>
                 </div>
-                <div class="card-body">
-                <p class="card-text">XDDDDDDDDDDDDDDDDDDDDDDDDD</p>
-                </div>
-            </div>
-            <hr>
-            <div>
-                <div class="form-floating">
-                    <h4>Agregar un comentario</h4>
-                    {% if session.user_id %}
-                    <form action="">
-                        
-                        <textarea class="form-control" placeholder="Agregar un comentario" id="floatingTextarea">Todavía no se puede comentar, no lo intentés</textarea>
-                        <button class="btn btn-outline-success" type="submit">Publicar</button>
-                    </form>
-                    {% else %}
-                    <p><i>Necesitas iniciar sesión para agregar un comentario.</i></p>
-                    {% endif %}
-                </div>
-            </div>
+                <div class="card-footer bg-transparent border-dark" style="font-size: .8rem;">{{i.date}}</div>
+                {% if permiso%}
+                  <form action="/delete_review" method="POST">
+                    <input class="visually-hidden" name="info" value="{{i.review_id}}"></input>
+                    <button type="submit" class="btn btn-link">Eliminar comentario</button>
+                  </form>
+                {% endif %}
+              </div>
+              {% endfor%}
+            {% else %}
+            <p>Todavía no hay comentarios aea</p>
+            {% endif %}
+            
         </div>
     </div>
   </div>

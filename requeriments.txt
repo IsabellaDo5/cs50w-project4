@@ -1,0 +1,7 @@
+flask
+flask_session
+sqlalchemy
+werkzeug
+functools
+tempfile
+datetime

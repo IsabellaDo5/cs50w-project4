@@ -6,7 +6,7 @@
 }
 
 .bg-custom {
-    background-color: #00000033 !important; 
+    background-color: #00000033 !important;
     border-radius: 30px;
 }
 .bg-img1{
@@ -30,10 +30,10 @@
 .title{
     font-family: 'Ubuntu', sans-serif;
     font-size: 2.5rem;
-    
+
 }
 .bg-light {
-    background-color: inherit !important; 
+    background-color: inherit !important;
 }
 
 .border-bottom {
@@ -67,7 +67,7 @@
     width: 300px !important;
 }
 .navbar-collapse {
-    flex-grow: 0 !important; 
+    flex-grow: 0 !important;
 
 }
 
@@ -136,7 +136,7 @@
 
 .btn-check:focus+.btn, .btn:focus {
     outline: 0;
-     box-shadow: none !important; 
+     box-shadow: none !important;
 }
 
 /*HOLAAAAAAAAA*/
@@ -150,6 +150,7 @@ img {
   }
   .photo-grid-item {
     margin: 0 auto 15px;
+    margin-left: 1rem;
     max-width: 400px;
     width: 100%;
   }

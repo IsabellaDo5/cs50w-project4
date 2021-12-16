@@ -37,7 +37,7 @@ app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 Session(app)
 
 # Set up database
-engine = create_engine(os.getenv("DATABASE_URL"))
+engine = create_engine(os.getenv("DATABASE_URL"), pool_size=20, max_overflow=0)
 db = scoped_session(sessionmaker(bind=engine))
 
 cat = db.execute("SELECT type FROM types").fetchall()
@@ -63,10 +63,10 @@ def main():
     try:
         a = session["user_id"]
         #usuario = db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":a }).fetchall()
-        
+
         usuario = db.execute("SELECT age FROM users WHERE user_id = :user_id", {"user_id": session["user_id"]}).fetchall()
         age = usuario[0]["age"]
-        
+
         if age < 18:
             info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY post_id DESC").fetchall()
 
@@ -80,19 +80,17 @@ def main():
             info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id ORDER BY likes DESC LIMIT 5").fetchall()
 
         info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
-        
-        
+
+        print("Hola")
         print(info_user)
 
-        return render_template("index.html", info = info, cat = cat, tags = tags, info_usuario = usuario, popular = most_pop)
+        return render_template("index.html", info = info, cat = cat, tags = tags, info_usuario = info_user, popular = most_pop)
     except:
         info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY post_id DESC").fetchall()
 
-        # Busca los posts con más likes 
+        # Busca los posts con más likes
         most_pop = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY likes DESC LIMIT 5").fetchall()
 
-        '''db.execute("UPDATE users SET admin = :admin WHERE user_id = :user_id", {"admin": 1, "user_id": 42})
-        db.commit()'''
         return render_template("index.html", info = info, cat = cat, tags = tags, popular = most_pop)
 
 # Registro
@@ -105,21 +103,13 @@ def register():
         confirm = request.form.get("confirm")
         birthday = request.form.get("birthday")
 
-        # Reguero para nada más dividir el string de la fecha porque no quise crear más condiciones
-        birth = birthday.split("-")
-        anio = int(birth[0])
-        month = int(birth[1])
-        day = int(birth[2])
-
-        # Ahora sí calcula la edad :)
-        age = calculateAge(date(anio, month, day))
 
         usernamedb = db.execute("SELECT username FROM users WHERE username = :username", {"username": request.form.get("username")}).fetchall()
-        
-        if not username or not password or not name or not confirm:
+
+        if not username or not password or not name or not confirm or not birthday:
             flash('Debe rellenar todos los campos')
             return render_template("register.html")
-    
+
         if confirm != password:
             flash('Las contraseñas no coinciden')
             return render_template("register.html")
@@ -127,8 +117,16 @@ def register():
         if len(usernamedb) != 0:
             flash('El nombre de usuario ya está en uso')
             return render_template("register.html")
-        
+
         if len(usernamedb) == 0 and password == confirm:
+            # Reguero para nada más dividir el string de la fecha porque no quise crear más condiciones
+            birth = birthday.split("-")
+            anio = int(birth[0])
+            month = int(birth[1])
+            day = int(birth[2])
+
+            # Ahora sí calcula la edad :)
+            age = calculateAge(date(anio, month, day))
             datos = db.execute("INSERT INTO users (username, password, name, age) VALUES (:username,:password,:name, :age) RETURNING user_id", { "username": username, "password" : generate_password_hash(password), "name": name, "age": age}).fetchall()
             db.commit()
 
@@ -146,18 +144,18 @@ def calculateAge(born):
     today = date.today()
     try:
         birthday = born.replace(year = today.year)
- 
+
     # raised when birth date is February 29
     # and the current year is not a leap year
     except ValueError:
         birthday = born.replace(year = today.year,
                   month = born.month + 1, day = 1)
- 
+
     if birthday > today:
         return today.year - born.year - 1
     else:
         return today.year - born.year
-     
+
 # Pagina de inicio de sesión
 @app.route("/login", methods=["GET","POST"])
 def login():
@@ -168,7 +166,7 @@ def login():
         password = request.form.get("password")
 
         user = db.execute("SELECT * FROM users WHERE username = :username", {"username":username}).fetchall()
-        print(user)
+
         if not username or not password:
             flash('Debe rellenar todos los campos')
             return render_template("login.html")
@@ -195,11 +193,13 @@ def crearpost():
     if request.method == "POST":
 
         if "archivo" not in request.files:
+            flash("Necesitas agregar una imagen.")
             return render_template("subir_img.html")
-        
+
         archivo = request.files['archivo']
 
         if archivo.filename == "":
+            flash("Necesitas agregar una imagen.")
             return render_template("subir_img.html")
 
         if archivo:
@@ -219,7 +219,7 @@ def crearpost():
             # dd/mm/YY H:M:S
             fecha = now.strftime("%d %B, %Y")
 
-            x = db.execute("SELECT type_id FROM types WHERE type = :type", {"type": tipo}).fetchall() 
+            x = db.execute("SELECT type_id FROM types WHERE type = :type", {"type": tipo}).fetchall()
             num_type = x[0]["type_id"]
 
             #(f"INSERT INTO usuario (username,password,name,lastname,email) VALUES ('{username}','{password}','{nombre}','{apellido}','{email}''')")
@@ -248,7 +248,7 @@ def topics(type):
 @app.route("/tag/<tag>")
 def tag(tag):
     tags2 = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE tag = :tag", {"tag":tag}).fetchall()
-    
+
     titulo = tags2[0]["tag"]
     return render_template("tags.html", tag_html = tags2, cat = cat, tags = tags, titulo = titulo)
 
@@ -261,28 +261,28 @@ def buscar():
 
         print(a)
         by_tag = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE LOWER(tag) LIKE LOWER(:busq)", {"busq":a}).fetchall()
-        
+
         # Busqueda por descripción
         descripcion = db.execute("SELECT user_id, photo, post_id FROM posts WHERE LOWER(description) LIKE LOWER(:busq)", {"busq":a}).fetchall()
-        
+
         usuarios = db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE LOWER(username) LIKE LOWER(:busq)", {"busq": a}).fetchall()
 
         if len(by_tag) == 0:
             tag_disp = False
         else:
             tag_disp = True
-        
-        
+
+
         if len(descripcion) == 0:
             desc_disp = False
         else:
             desc_disp = True
-        
+
         if len(usuarios) == 0:
             user_disp = False
         else:
             user_disp = True
-        
+
         print(by_tag)
         print(descripcion)
         print(usuarios)
@@ -296,7 +296,7 @@ def verpost(post_id):
     post = db.execute("SELECT post_id, posts.user_id, photo, description, username, name, likes FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE post_id = :post_id", {"post_id": post_id}).fetchall()
     tags_p = db.execute("SELECT tag FROM tags WHERE post_id =:post_id", {"post_id": post_id}).fetchall()
     reviews = db.execute("SELECT review_id, comment, date, username, reviews.user_id FROM reviews INNER JOIN users ON reviews.user_id = users.user_id WHERE post_id = :post_id ORDER BY reviews.review_id DESC", {"post_id": post_id}).fetchall()
-    
+
     print(reviews)
 
     propietario = False
@@ -316,8 +316,8 @@ def verpost(post_id):
             propietario = True
     except:
         print("No es el usuario")
-    
-    # Permite eliminar los comentarios si el usuario es admin o el creador del comentario 
+
+    # Permite eliminar los comentarios si el usuario es admin o el creador del comentario
     permiso = False
     try:
         ad = db.execute("SELECT * FROM users WHERE user_id = :user_id", {"user_id": session["user_id"]}).fetchall()
@@ -367,10 +367,13 @@ def d_review():
 def d_post(post_id):
     db.execute("DELETE FROM tags WHERE post_id = :post_id", {"post_id": post_id})
     db.commit()
-    db.execute("DELETE FROM posts WHERE post_id = :post_id", {"post_id": post_id})
+    db.execute("DELETE FROM reviews WHERE post_id = :post_id", {"post_id": post_id})
     db.commit()
     db.execute("DELETE FROM likes WHERE post_id = :post_id", {"post_id": post_id})
     db.commit()
+    db.execute("DELETE FROM posts WHERE post_id = :post_id", {"post_id": post_id})
+    db.commit()
+
     return redirect("/")
 
 # Agrega los comentarios a la db
@@ -400,7 +403,7 @@ def settings():
         # Datos del html
         description = request.form.get("texto")
         archivo = request.files['archivo']
-        
+
         if "archivo" not in request.files or archivo.filename == "":
             db.execute("UPDATE profiles SET description = :description WHERE user_id = :user_id",{"user_id": session["user_id"], "description": description})
             db.commit()
@@ -410,7 +413,7 @@ def settings():
             archivo.save(os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))
 
             url_img = (os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))[1:len(os.path.join(app.config["UPLOAD_FOLDER"], nombreArchivo))]
-            
+
             print(url_img)
 
             db.execute("UPDATE profiles SET icon = :icon, description = :description WHERE user_id = :user_id ", {"icon": url_img, "description": description, "user_id": session["user_id"]})
@@ -422,6 +425,27 @@ def settings():
     perfil_desc = xd[0]["description"]
 
     return render_template("settings.html", desc = perfil_desc, tags = tags, cat = cat)
+
+@app.route("/c_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        antigua = request.form.get("actual")
+        nueva = request.form.get("newpassword")
+        confirm = request.form.get("confirm")
+
+        if not antigua or not nueva or not confirm:
+            flash("Debe rellenar todos los campos")
+            return render_template("settings.html")
+
+        contra = db.execute("SELECT password FROM users WHERE user_id = :user_id", {"user_id": session["user_id"]}).fetchall()
+
+        if not check_password_hash(contra[0]["password"], antigua):
+            return render_template("settings.html")
+
+        db.execute("UPDATE users SET password = :password WHERE user_id = :user_id", {"password": generate_password_hash(confirm), "user_id": session["user_id"]})
+        db.commit()
+    return redirect("/logout")
 
 # Muestra el perfil del usuario
 @app.route("/profile/<username>")
@@ -437,7 +461,7 @@ def perfil(username):
     print(posts)
     print(id_user)
     try:
-        desc = info[0]["description"] 
+        desc = info[0]["description"]
     except:
 
         aea = False
@@ -459,9 +483,9 @@ def repos():
         if "archivo" not in request.files:
             flash("Necesitas agregar un archivo")
             return render_template("repos.html", cat=cat, tags = tags)
-            
+
         archivo = request.files['archivo']
-        
+
         if archivo.filename == "":
             flash("Necesitas agregar un archivo")
             return render_template("repos.html")
@@ -491,7 +515,7 @@ def repos():
             permiso = True
         return render_template("repos.html", tags = tags, cat = cat, archivos = repo, permiso = permiso, repo_id = repo_id)
 
-# Elimina la ruta de un archivo en la db 
+# Elimina la ruta de un archivo en la db
 @app.route("/delete_r/<repo_id>", methods=["GET", "POST"])
 @login_required
 def repo_delete(repo_id):

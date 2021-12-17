@@ -81,10 +81,13 @@ def main():
 
         info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
 
+        n_usuario = info_user[0]["username"]
         print("Hola")
         print(info_user)
+        print(n_usuario)
+        print("fin")
 
-        return render_template("index.html", info = info, cat = cat, tags = tags, info_usuario = info_user, popular = most_pop)
+        return render_template("index.html", info = info, cat = cat, tags = tags, info2 = info_user, popular = most_pop)
     except:
         info = db.execute("SELECT posts.user_id, post_id, username, photo, fecha FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE posts.rate IS NULL ORDER BY post_id DESC").fetchall()
 
@@ -242,7 +245,14 @@ def crearpost():
 @app.route("/topics/<type>")
 def topics(type):
     topic = db.execute("SELECT posts.post_id, posts.user_id, photo, username FROM posts INNER JOIN types ON posts.type = types.type_id INNER JOIN users ON posts.user_id = users.user_id WHERE types.type = :type", {"type":type}).fetchall()
-    return render_template("categorias.html", topic = topic, cat = cat, tags = tags, type = type)
+
+    info_user = ""
+    try:
+        info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+    except:
+        aea = False
+
+    return render_template("categorias.html", topic = topic, info2 = info_user, cat = cat, tags = tags, type = type)
 
 # muestra todos los posts con los tags que coinciden
 @app.route("/tag/<tag>")
@@ -250,7 +260,14 @@ def tag(tag):
     tags2 = db.execute("SELECT posts.user_id, photo, posts.post_id, tag FROM posts INNER JOIN tags ON tags.post_id = posts.post_id WHERE tag = :tag", {"tag":tag}).fetchall()
 
     titulo = tags2[0]["tag"]
-    return render_template("tags.html", tag_html = tags2, cat = cat, tags = tags, titulo = titulo)
+
+    info_user = ""
+    try:
+        info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+    except:
+        aea = False
+
+    return render_template("tags.html", tag_html = tags2, info2 = info_user, cat = cat, tags = tags, titulo = titulo)
 
 # búsqueda
 @app.route("/search", methods=["GET", "POST"])
@@ -296,6 +313,12 @@ def verpost(post_id):
     post = db.execute("SELECT post_id, posts.user_id, photo, description, username, name, likes FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE post_id = :post_id", {"post_id": post_id}).fetchall()
     tags_p = db.execute("SELECT tag FROM tags WHERE post_id =:post_id", {"post_id": post_id}).fetchall()
     reviews = db.execute("SELECT review_id, comment, date, username, reviews.user_id FROM reviews INNER JOIN users ON reviews.user_id = users.user_id WHERE post_id = :post_id ORDER BY reviews.review_id DESC", {"post_id": post_id}).fetchall()
+
+    info_user = ""
+    try:
+        info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+    except:
+        aea = False
 
     print(reviews)
 
@@ -346,7 +369,7 @@ def verpost(post_id):
     # y un except que no hace mucho más q existir
     except:
         print("xd")
-    return render_template("post.html", post = post, icon = icon, tags = tags_p, reviews = reviews, propietario = propietario, cat = cat, like = like, cant_likes = likes, permiso = permiso)
+    return render_template("post.html", info2 = info_user, post = post, icon = icon, tags = tags_p, reviews = reviews, propietario = propietario, cat = cat, like = like, cant_likes = likes, permiso = permiso)
 
 @app.route("/delete_review", methods=["GET", "POST"])
 @login_required
@@ -424,7 +447,12 @@ def settings():
     xd = db.execute("SELECT description FROM profiles WHERE user_id = :user_id",{"user_id": session["user_id"]}).fetchall()
     perfil_desc = xd[0]["description"]
 
-    return render_template("settings.html", desc = perfil_desc, tags = tags, cat = cat)
+    info_user = ""
+    try:
+        info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+    except:
+        aea = False
+    return render_template("settings.html", desc = perfil_desc, info2 = info_user, tags = tags, cat = cat)
 
 @app.route("/c_password", methods=["GET", "POST"])
 @login_required
@@ -458,8 +486,13 @@ def perfil(username):
     posts = db.execute("SELECT * FROM posts WHERE user_id = :user_id ORDER BY post_id DESC", {"user_id": user }).fetchall()
 
     usuario = False
-    print(posts)
-    print(id_user)
+
+    info_user = ""
+    try:
+        info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+    except:
+        aea = False
+
     try:
         desc = info[0]["description"]
     except:
@@ -473,7 +506,7 @@ def perfil(username):
         usuario = False
 
     print(info)
-    return render_template("profile.html", info = info, desc= desc, cat=cat, tags = tags, username = username, posts = posts, propietario = usuario)
+    return render_template("profile.html", info = info, info2= info_user, desc= desc, cat=cat, tags = tags, username = username, posts = posts, propietario = usuario)
 
 # repositorio con un espacio de 5 archivos máximos
 @app.route("/repo", methods=["GET", "POST"])
@@ -513,7 +546,14 @@ def repos():
                 permiso = True
         except:
             permiso = True
-        return render_template("repos.html", tags = tags, cat = cat, archivos = repo, permiso = permiso, repo_id = repo_id)
+
+        # Perfil
+        info_user = ""
+        try:
+            info_user= db.execute("SELECT username, name, icon FROM users INNER JOIN profiles ON profiles.user_id = users.user_id WHERE users.user_id = :user_id", {"user_id":session["user_id"] }).fetchall()
+        except:
+            aea = False
+        return render_template("repos.html", tags = tags, info2 = info_user, cat = cat, archivos = repo, permiso = permiso, repo_id = repo_id)
 
 # Elimina la ruta de un archivo en la db
 @app.route("/delete_r/<repo_id>", methods=["GET", "POST"])

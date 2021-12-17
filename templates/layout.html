@@ -40,19 +40,25 @@
                 <li>
                     <a href="/">Ir a inicio</a>
                 </li>
+                <hr>
                 {% if session.user_id %}
-                {% for j in info_usuario %}
-                <a class="navbar-brand" href="/profile/{{j.username}}">
-                    <img src="https://i.pinimg.com/originals/33/9a/39/339a398b31af3f3b979b0360df67aa9f.jpg" alt="icon" style="width:60px; margin-left:8%" class="rounded-pill">
-                </a>
-                <a href="/profile/{{j.username}}" class="user">{{j.username}}</a>
+                {% for a in info2 %}
+                    <li>
+                    <a class="navbar-brand" href="/profile/{{a['username']}}">
+                        <img src="{{a['icon']}}" alt="icon" style="width:60px; margin-left:8%" class="rounded-pill"/>
+                    </a>
+                    <a href="/profile/{{a['username']}}" class="user">@{{a['username']}}</a>
+                    </li>
                 {% endfor %}
+                {% endif %}
+
+                {% if session.user_id %}
                 <hr>
                  <li>
                     <a href="/upload">Subir una ilustración</a>
                 </li>
-
                 {% endif %}
+
                 <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Tags</a>
 

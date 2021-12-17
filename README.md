@@ -19,22 +19,17 @@ Las personas pueden navegar por el sitio sin necesidad de usar una cuenta, pero 
 - profile : Muestra la información e ilustraciones del usuario.
 - no_results: Página de error en caso de que no se encuentre un post.
 
- **app.py**
-
+#### app.py
 Funcionalidad de la página.
 
- **Carpeta: icons**
-
+#### Carpeta: icons
 Íconos que uso en la página.
 
- **Carpeta: img**
-
+#### Carpeta: img
 Las imágenes que suben los usuarios se guardan en esta carpeta.
 
- **Carpeta: repositorio**
-
+#### Carpeta: repositorio
 Aquí se guardan los archivos que se suben a los repositorios de cada usuario.
 
- **login.js**
-
-No hace nada realmente, pero en este punto no recuerdo en cuántos formularios lo ocupé, entonces lo dejo por si acaso.
+#### login.js
+No hace nada realmente, pero en este punto no recuerdo en cuántos formularios lo agregué, entonces lo dejo por si acaso.

@@ -1,9 +1,10 @@
 # cs50w-project4
 
 Mi proyecto final es un sitio dirigido a que ilustradores y dibujantes suban sus trabajos.
+
 Las personas pueden navegar por el sitio sin necesidad de usar una cuenta, pero si quieren subir un post o dejar alguna opinión de las ilustraciones que hay en el sitio, tendrán que iniciar sesión.
 
-**La URI de la db se encuentra en el archivo "datos.txt", dentro de mi IDE**
+**La URI de la db se encuentra en el archivo "datos.txt", dentro de la misma carpeta de este proyecto en mi IDE**
 
 ## ¿Qué contiene cada archivo?
 
@@ -19,16 +20,21 @@ Las personas pueden navegar por el sitio sin necesidad de usar una cuenta, pero 
 - no_results: Página de error en caso de que no se encuentre un post.
 
  **app.py**
+
 Funcionalidad de la página.
 
  **Carpeta: icons**
+
 Íconos que uso en la página.
 
  **Carpeta: img**
+
 Las imágenes que suben los usuarios se guardan en esta carpeta.
 
  **Carpeta: repositorio**
+
 Aquí se guardan los archivos que se suben a los repositorios de cada usuario.
 
  **login.js**
+
 No hace nada realmente, pero en este punto no recuerdo en cuántos formularios lo ocupé, entonces lo dejo por si acaso.

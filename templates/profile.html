@@ -12,12 +12,16 @@
             <h1>{{i.name}}</h1>
             <h5 style="font-size: 1.2rem;">@{{i.username}}</h5>
             {% if desc %}
-            <p>{{desc}}</p>
+            <div class="" style ="max-width: 90%; margin: auto;">
+                <!-- style ="width:95%; margin:auto; wrap: true; overflow:hidden; border: 1px solid;" -->
+                <p style= "  overflow-wrap: break-word; word-wrap: break-word; hyphens: auto;">{{desc}}</p>
+            </div>
+
             {% else %}
             <p style="color:gray !important;"><i>Sin descripción por parte del usuario</i></p>
             {% endif %}
-            
-        
+
+
         </div>
     </div>
     <hr>
